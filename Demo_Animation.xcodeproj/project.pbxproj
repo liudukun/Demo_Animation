@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E315128A1F341AFB00FF1DF9 /* BottleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E31512891F341AFB00FF1DF9 /* BottleModel.m */; };
 		E37A60DD1F340CAB00F971E7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E37A60DC1F340CAB00F971E7 /* main.m */; };
 		E37A60E01F340CAB00F971E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E37A60DF1F340CAB00F971E7 /* AppDelegate.m */; };
 		E37A60E31F340CAB00F971E7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E37A60E21F340CAB00F971E7 /* ViewController.m */; };
 		E37A60E61F340CAB00F971E7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E37A60E41F340CAB00F971E7 /* Main.storyboard */; };
 		E37A60E81F340CAB00F971E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E37A60E71F340CAB00F971E7 /* Assets.xcassets */; };
 		E37A60EB1F340CAB00F971E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E37A60E91F340CAB00F971E7 /* LaunchScreen.storyboard */; };
+		E37A60F41F340D1700F971E7 /* MessageBottleView.m in Sources */ = {isa = PBXBuildFile; fileRef = E37A60F31F340D1700F971E7 /* MessageBottleView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E31512881F341AFB00FF1DF9 /* BottleModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BottleModel.h; sourceTree = "<group>"; };
+		E31512891F341AFB00FF1DF9 /* BottleModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BottleModel.m; sourceTree = "<group>"; };
 		E37A60D81F340CAB00F971E7 /* Demo_Animation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo_Animation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E37A60DC1F340CAB00F971E7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E37A60DE1F340CAB00F971E7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -26,6 +30,8 @@
 		E37A60E71F340CAB00F971E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E37A60EA1F340CAB00F971E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E37A60EC1F340CAB00F971E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E37A60F21F340D1700F971E7 /* MessageBottleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageBottleView.h; sourceTree = "<group>"; };
+		E37A60F31F340D1700F971E7 /* MessageBottleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageBottleView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +68,10 @@
 				E37A60DF1F340CAB00F971E7 /* AppDelegate.m */,
 				E37A60E11F340CAB00F971E7 /* ViewController.h */,
 				E37A60E21F340CAB00F971E7 /* ViewController.m */,
+				E37A60F21F340D1700F971E7 /* MessageBottleView.h */,
+				E37A60F31F340D1700F971E7 /* MessageBottleView.m */,
+				E31512881F341AFB00FF1DF9 /* BottleModel.h */,
+				E31512891F341AFB00FF1DF9 /* BottleModel.m */,
 				E37A60E41F340CAB00F971E7 /* Main.storyboard */,
 				E37A60E71F340CAB00F971E7 /* Assets.xcassets */,
 				E37A60E91F340CAB00F971E7 /* LaunchScreen.storyboard */,
@@ -152,6 +162,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E37A60E31F340CAB00F971E7 /* ViewController.m in Sources */,
+				E37A60F41F340D1700F971E7 /* MessageBottleView.m in Sources */,
+				E315128A1F341AFB00FF1DF9 /* BottleModel.m in Sources */,
 				E37A60E01F340CAB00F971E7 /* AppDelegate.m in Sources */,
 				E37A60DD1F340CAB00F971E7 /* main.m in Sources */,
 			);
@@ -277,6 +289,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 7DLHL529H6;
 				INFOPLIST_FILE = Demo_Animation/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.liudukun.Demo-Animation";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -289,6 +302,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 7DLHL529H6;
 				INFOPLIST_FILE = Demo_Animation/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.liudukun.Demo-Animation";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -314,6 +328,7 @@
 				E37A60F11F340CAB00F971E7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
