@@ -8,13 +8,13 @@
 
 #import "MessageBottleView.h"
 
+#define waveY 150
 
 @interface Bottle()
 {
     CGFloat hideHeight;
     CGFloat selfWidth;
     NSDictionary *attr ;
-    CGFloat bottleWidth;
 }
 
 @end
@@ -25,7 +25,6 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        bottleWidth = frame.size.width;
         self.backgroundColor = [UIColor clearColor];
     }
     return self;
@@ -53,9 +52,9 @@
     [frameImage drawInRect:CGRectMake(0, 0, selfWidth,  70)];
     [self.model.message drawInRect:CGRectMake(20, 70 /4.5, selfWidth, 50) withAttributes:attr];
     
-    
-    CGFloat bottleHeight = selfWidth * bottleSize.height/bottleSize.width;
-    [bottleImage drawInRect:CGRectMake(0, 70 - 10,  rect.size.width/5*4, bottleHeight)];
+    CGFloat bottleWidth = 80;
+    CGFloat bottleHeight = bottleWidth * bottleSize.height/bottleSize.width;
+    [bottleImage drawInRect:CGRectMake((selfWidth - bottleWidth)/2, 70 - 10,  bottleWidth, bottleHeight)];
     
 }
 
@@ -98,6 +97,7 @@
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGesture:)];
         [self addGestureRecognizer:tap];
         
+        [self createWave];
     }
     return self;
 }
@@ -110,15 +110,16 @@
         }
     }];
     
-    
 }
 
 - (void)setModels:(NSArray *)models{
     _models = models;
     
-    NSTimer *timer =  [NSTimer timerWithTimeInterval:5 target:self selector:@selector(timerCreate) userInfo:nil repeats:YES];
+    NSTimer *timer =  [NSTimer timerWithTimeInterval:9 target:self selector:@selector(timerCreate) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     [timer fire];
+    
+
 }
 
 - (void)timerCreate{
@@ -152,13 +153,13 @@
     CAAnimationGroup *group = [CAAnimationGroup animation];
     group.delegate = self;
     [group setValue:seagull forKey:@"seagull"];
-    group.duration = 4;
+    group.duration = 8;
     group.repeatCount = 1;
     group.fillMode = kCAFillModeForwards;
 
     group.animations = @[scaleAnim,animate];
     [seagull.layer addAnimation:group forKey:@"runSeagull"];
-    group.removedOnCompletion = NO;
+    group.removedOnCompletion = YES;
     CGPathRelease(animate.path);
     
 }
@@ -180,7 +181,7 @@
     CAAnimationGroup *group = [CAAnimationGroup animation];
     group.delegate = self;
     [group setValue:ballon forKey:@"ballon"];
-    group.duration = 10;
+    group.duration = 20;
     group.repeatCount = 1;
     group.fillMode = kCAFillModeForwards;
     
@@ -189,6 +190,25 @@
     group.removedOnCompletion = NO;
     CGPathRelease(animate.path);
     
+}
+
+- (void)createWave{
+    UIImage *image = [UIImage imageNamed:@"wave"];
+    UIImageView *wave = [[UIImageView alloc]init];
+    wave.frame = CGRectMake(0, waveY, self.frame.size.width, self.frame.size.width / image.size.width * image.size.height);
+    wave.image = image;
+    [self insertSubview:wave atIndex:1];
+    
+    CAKeyframeAnimation *animate = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    [animate setValue:wave forKey:@"wave"];
+    animate.repeatCount = CGFLOAT_MAX;
+    animate.fillMode = kCAFillModeForwards;
+    animate.autoreverses = YES;
+    animate.duration = 4;
+    animate.path = [self wavePath];
+    [wave.layer addAnimation:animate forKey:@"runwave"];
+    
+    CGPathRelease(animate.path);
 }
 
 
@@ -200,7 +220,7 @@
     
     CAKeyframeAnimation *animate = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     [animate setValue:bottle forKey:@"bottle-1"];
-    animate.duration = 20;
+    animate.duration = 40;
     animate.delegate = self;
     animate.fillMode = kCAFillModeForwards;
     animate.repeatCount = 0;
@@ -209,6 +229,16 @@
     [bottle.layer addAnimation:animate forKey:@"runbottle"];
     
     CGPathRelease(animate.path);
+}
+
+- (CGPathRef )wavePath{
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPoint startPoint = CGPointMake(self.frame.size.width/2, waveY);
+    CGPoint endPoint = CGPointMake(self.frame.size.width/2,waveY -10);
+    CGPathMoveToPoint(path, NULL, startPoint.x, startPoint.y);
+    CGPathAddLineToPoint(path, NULL, endPoint.x, endPoint.y);
+    CGPathAddLineToPoint(path, NULL, startPoint.x, startPoint.y);
+    return path;
 }
 
 - (CGPathRef )ballonPath{
@@ -233,9 +263,9 @@
 
 - (CGPathRef )bottlePath{
     CGMutablePathRef path = CGPathCreateMutable();
-    CGFloat w = self.frame.size.width/5;
+    CGFloat w = self.frame.size.width / 5;
     CGFloat baseLine = 100;
-    CGFloat jump = 50;
+    CGFloat jump = 30;
     
     for (int i =0; i<10; i++) {
         CGFloat h = 0;
@@ -269,7 +299,7 @@
     
     UIImageView *ballon = [anim valueForKey:@"ballon"];
     [ballon removeFromSuperview];
-    
+
 }
 
 @end
