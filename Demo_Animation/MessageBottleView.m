@@ -34,7 +34,7 @@
 }
 
 - (void)loadView{
-    NSString * randomBottle = [NSString stringWithFormat:@"bottle-%i",1+arc4random_uniform(1)];
+    NSString * randomBottle = [NSString stringWithFormat:@"bottle-%i",1+arc4random_uniform(4)];
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"HH"];
     NSString *str = [formatter stringFromDate:[NSDate date]];
@@ -87,7 +87,7 @@
     animate.fillMode = kCAFillModeForwards;
     animate.autoreverses = YES;
     animate.duration = 6;
-    animate.byValue = @(3.14/360*45);
+    animate.byValue = @(3.14/360*30);
     [bottleImageView.layer addAnimation:animate forKey:@"runwave"];
 }
 
@@ -174,7 +174,7 @@
     animate.repeatCount = CGFLOAT_MAX;
     animate.fillMode = kCAFillModeForwards;
     animate.autoreverses = YES;
-    animate.duration = 4;
+    animate.duration = 6;
     animate.path = [self wavePath:position];
     [seagull.layer addAnimation:animate forKey:@"runwave"];
     
@@ -195,7 +195,7 @@
     animate.repeatCount = CGFLOAT_MAX;
     animate.fillMode = kCAFillModeForwards;
     animate.autoreverses = YES;
-    animate.duration = 4;
+    animate.duration = 6;
     animate.path = [self wavePath:position];
     [ballon.layer addAnimation:animate forKey:@"runBallon"];
     
