@@ -8,13 +8,15 @@
 
 #import "MessageBottleView.h"
 
-#define waveY 150
 
 @interface Bottle()
 {
     CGFloat hideHeight;
     CGFloat selfWidth;
     NSDictionary *attr ;
+    UIImageView *frameImageView;
+    UILabel *messageLabel;
+    UIImageView *bottleImageView;
 }
 
 @end
@@ -26,11 +28,12 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
+        self.layer.masksToBounds = YES;
     }
     return self;
 }
 
-- (void)drawRect:(CGRect)rect{
+- (void)loadView{
     NSString * randomBottle = [NSString stringWithFormat:@"bottle-%i",1+arc4random_uniform(1)];
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"HH"];
@@ -49,28 +52,44 @@
     UIImage *frameImage = [UIImage imageNamed:frame];
     CGSize bottleSize = bottleImage.size;
     
-    [frameImage drawInRect:CGRectMake(0, 0, selfWidth,  70)];
-    [self.model.message drawInRect:CGRectMake(20, 70 /4.5, selfWidth, 50) withAttributes:attr];
+    frameImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, selfWidth, 70)];
+    frameImageView.image = frameImage;
+    [self addSubview:frameImageView];
     
+    messageLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 2, selfWidth, 50)];
+    messageLabel.attributedText = [[NSAttributedString alloc]initWithString:self.model.message attributes:attr];
+    [self addSubview:messageLabel];
+
     CGFloat bottleWidth = 80;
     CGFloat bottleHeight = bottleWidth * bottleSize.height/bottleSize.width;
-    [bottleImage drawInRect:CGRectMake((selfWidth - bottleWidth)/2, 70 - 10,  bottleWidth, bottleHeight)];
+    bottleImageView = [[UIImageView alloc]initWithFrame:CGRectMake((selfWidth - bottleWidth)/2, 70 - 5,  bottleWidth, bottleHeight)];
+    bottleImageView.image = bottleImage;
+    [self addSubview:bottleImageView];
     
+    [self runAnimation];
 }
 
 - (void)setModel:(BottleModel *)model{
     _model = model;
-    attr = @{NSFontAttributeName:[UIFont systemFontOfSize:15 weight:8],NSForegroundColorAttributeName:[UIColor colorWithRed:43.0/255 green:98.0/255 blue:149.0/255 alpha:1]};
+    attr = @{NSFontAttributeName:[UIFont systemFontOfSize:15 weight:10],NSForegroundColorAttributeName:[UIColor colorWithRed:43.0/255 green:98.0/255 blue:149.0/255 alpha:1]};
     CGSize size =  [self.model.message sizeWithAttributes:attr];
     selfWidth = size.width + 40;
     CGRect rect = self.frame;
     rect.size.width = selfWidth;
     self.frame = rect;
     
-    [self setNeedsDisplay];
+    [self loadView];
 }
 
-
+- (void)runAnimation{
+    CABasicAnimation *animate = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animate.repeatCount = CGFLOAT_MAX;
+    animate.fillMode = kCAFillModeForwards;
+    animate.autoreverses = YES;
+    animate.duration = 6;
+    animate.byValue = @(3.14/360*45);
+    [bottleImageView.layer addAnimation:animate forKey:@"runwave"];
+}
 
 @end
 
@@ -80,6 +99,7 @@
 {
     int count;
     NSMutableArray *bottles;
+    NSTimer *timer ;
 }
 @end
 
@@ -89,15 +109,11 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        UIImageView *bgView = [[UIImageView alloc]initWithFrame:self.bounds];
-        bgView.image = [UIImage imageNamed:@"bg_light"];
-        bgView.backgroundColor = [UIColor groupTableViewBackgroundColor];
-        [self addSubview:bgView];
+        self.layer.masksToBounds = YES;
         bottles = [NSMutableArray array];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGesture:)];
         [self addGestureRecognizer:tap];
         
-        [self createWave];
     }
     return self;
 }
@@ -107,6 +123,7 @@
     [bottles enumerateObjectsUsingBlock:^(Bottle  *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj.layer.presentationLayer hitTest:touchPoint]) {
             self.actionBottle(obj.model);
+            *stop = YES;
         }
     }];
     
@@ -114,101 +131,96 @@
 
 - (void)setModels:(NSArray *)models{
     _models = models;
-    
-    NSTimer *timer =  [NSTimer timerWithTimeInterval:9 target:self selector:@selector(timerCreate) userInfo:nil repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
-    [timer fire];
-    
+}
 
+- (void)reloadAnimation{
+    [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj removeFromSuperview];
+    }];
+    UIImageView *bgView = [[UIImageView alloc]initWithFrame:self.bounds];
+    bgView.image = [UIImage imageNamed:@"bg_light"];
+    bgView.backgroundColor = [UIColor groupTableViewBackgroundColor];
+    [self addSubview:bgView];
+    [self createWave];
+    [self createSeagull:@"seagull-1" point:CGPointMake(self.frame.size.width / 2 - 20, 90)];
+    [self createSeagull:@"seagull-2" point:CGPointMake(self.frame.size.width / 2 + 20, 80)];
+    [self createBallon:@"ballon-1" point:CGPointMake(self.frame.size.width / 4, 40)];
+    [self createBallon:@"ballon-2" point:CGPointMake(self.frame.size.width / 4*3, 40)];
+    if (!timer) {
+        timer =  [NSTimer timerWithTimeInterval:40/3.0 target:self selector:@selector(timerCreate) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+        [timer fire];
+    }else{
+        [timer setFireDate:[NSDate date]];
+    }
 }
 
 - (void)timerCreate{
-    
-    if (count % 2 == 0) {
-        [self createSeagull];
-    }
-    if (count % 3 == 0) {
-        [self createBallon];
-    }
-    
+ 
     [self createBottleWithModel:self.models[count%self.models.count]];
     count ++;
 }
 
-- (void)createSeagull{
-    UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"seagull-%i",arc4random_uniform(2)+1]];
+- (void)createSeagull:(NSString *)imageName point:(CGPoint)position{
+    UIImage *image = [UIImage imageNamed:imageName];
     UIImageView *seagull = [[UIImageView alloc]init];
-    seagull.frame = CGRectMake(-100, -100, 40, 40 / image.size.width * image.size.height);
+    CGFloat width = 14 + arc4random_uniform(10);
+
+    seagull.frame = CGRectMake(-100, -100, width, width / image.size.width * image.size.height);
     seagull.image = image;
     [self insertSubview:seagull atIndex:1];
     
     CAKeyframeAnimation *animate = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    animate.path = [self seagullPath];
+    animate.repeatCount = CGFLOAT_MAX;
+    animate.fillMode = kCAFillModeForwards;
+    animate.autoreverses = YES;
+    animate.duration = 4;
+    animate.path = [self wavePath:position];
+    [seagull.layer addAnimation:animate forKey:@"runwave"];
     
-    CABasicAnimation *scaleAnim = [CABasicAnimation animationWithKeyPath:@"transform"];
-    scaleAnim.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
-    scaleAnim.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.3, 0.3, 1.0)];
-
-    
-    CAAnimationGroup *group = [CAAnimationGroup animation];
-    group.delegate = self;
-    [group setValue:seagull forKey:@"seagull"];
-    group.duration = 8;
-    group.repeatCount = 1;
-    group.fillMode = kCAFillModeForwards;
-
-    group.animations = @[scaleAnim,animate];
-    [seagull.layer addAnimation:group forKey:@"runSeagull"];
-    group.removedOnCompletion = YES;
     CGPathRelease(animate.path);
     
 }
 
-- (void)createBallon{
-    UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"ballon-%i",arc4random_uniform(2)+1]];
+- (void)createBallon:(NSString *)imageName point:(CGPoint)position{
+    UIImage *image = [UIImage imageNamed:imageName];
     UIImageView *ballon = [[UIImageView alloc]init];
-    ballon.frame = CGRectMake(-100, -100, 40, 40 / image.size.width * image.size.height);
+    CGFloat width = 22 + arc4random_uniform(10);
+    ballon.frame = CGRectMake(-100, -100, width, width / image.size.width * image.size.height);
     ballon.image = image;
     [self insertSubview:ballon atIndex:1];
     
+    
     CAKeyframeAnimation *animate = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    animate.path = [self ballonPath];
+    animate.repeatCount = CGFLOAT_MAX;
+    animate.fillMode = kCAFillModeForwards;
+    animate.autoreverses = YES;
+    animate.duration = 4;
+    animate.path = [self wavePath:position];
+    [ballon.layer addAnimation:animate forKey:@"runBallon"];
     
-    CABasicAnimation *scaleAnim = [CABasicAnimation animationWithKeyPath:@"transform"];
-    scaleAnim.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
-    scaleAnim.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.3, 0.3, 1.0)];
-    
-    CAAnimationGroup *group = [CAAnimationGroup animation];
-    group.delegate = self;
-    [group setValue:ballon forKey:@"ballon"];
-    group.duration = 20;
-    group.repeatCount = 1;
-    group.fillMode = kCAFillModeForwards;
-    
-    group.animations = @[scaleAnim,animate];
-    [ballon.layer addAnimation:group forKey:@"runBallon"];
-    group.removedOnCompletion = NO;
     CGPathRelease(animate.path);
+    
     
 }
 
 - (void)createWave{
     UIImage *image = [UIImage imageNamed:@"wave"];
     UIImageView *wave = [[UIImageView alloc]init];
-    wave.frame = CGRectMake(0, waveY, self.frame.size.width, self.frame.size.width / image.size.width * image.size.height);
+    wave.frame = CGRectMake(0, 150, self.frame.size.width, self.frame.size.width / image.size.width * image.size.height);
     wave.image = image;
     [self insertSubview:wave atIndex:1];
     
     CAKeyframeAnimation *animate = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    [animate setValue:wave forKey:@"wave"];
     animate.repeatCount = CGFLOAT_MAX;
     animate.fillMode = kCAFillModeForwards;
     animate.autoreverses = YES;
     animate.duration = 4;
-    animate.path = [self wavePath];
+    animate.path = [self wavePath:CGPointMake(self.frame.size.width / 2, 150)];
     [wave.layer addAnimation:animate forKey:@"runwave"];
     
     CGPathRelease(animate.path);
+    
 }
 
 
@@ -231,43 +243,26 @@
     CGPathRelease(animate.path);
 }
 
-- (CGPathRef )wavePath{
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPoint startPoint = CGPointMake(self.frame.size.width/2, waveY);
-    CGPoint endPoint = CGPointMake(self.frame.size.width/2,waveY -10);
-    CGPathMoveToPoint(path, NULL, startPoint.x, startPoint.y);
-    CGPathAddLineToPoint(path, NULL, endPoint.x, endPoint.y);
-    CGPathAddLineToPoint(path, NULL, startPoint.x, startPoint.y);
-    return path;
-}
 
-- (CGPathRef )ballonPath{
+- (CGPathRef )wavePath:(CGPoint)startPoint{
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPoint startPoint = CGPointMake(self.frame.size.width - 40, 100);
-    CGPoint endPoint = CGPointMake(arc4random_uniform(100)+120,0);
-    CGPoint controlPoint = CGPointMake(endPoint.x/3 ,startPoint.y/3);
     CGPathMoveToPoint(path, NULL, startPoint.x, startPoint.y);
-    CGPathAddQuadCurveToPoint(path, NULL, controlPoint.x , controlPoint.y, endPoint.x, endPoint.y);
-    return path;
-}
-
-- (CGPathRef )seagullPath{
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPoint startPoint = CGPointMake(0, arc4random_uniform(120));
-    CGPoint endPoint = CGPointMake(self.frame.size.width -  arc4random_uniform(120),0);
-    CGPoint controlPoint = CGPointMake(endPoint.x/2 ,startPoint.y/3);
-    CGPathMoveToPoint(path, NULL, startPoint.x, startPoint.y);
-    CGPathAddQuadCurveToPoint(path, NULL, controlPoint.x , controlPoint.y, endPoint.x, endPoint.y);
+    int i = arc4random_uniform(2);
+    if (i) {
+        CGPathAddLineToPoint(path, NULL, startPoint.x, startPoint.y + 10);
+    }else{
+        CGPathAddLineToPoint(path, NULL, startPoint.x, startPoint.y - 10);
+    }
     return path;
 }
 
 - (CGPathRef )bottlePath{
     CGMutablePathRef path = CGPathCreateMutable();
-    CGFloat w = self.frame.size.width / 5;
+    CGFloat w = self.frame.size.width / 10;
     CGFloat baseLine = 100;
     CGFloat jump = 30;
     
-    for (int i =0; i<10; i++) {
+    for (int i =0; i< 15; i++) {
         CGFloat h = 0;
         if (i%2 ==0) {
             h = baseLine - arc4random_uniform(jump);
@@ -277,7 +272,7 @@
         
         CGPoint startPoint = CGPointMake(w*i, baseLine);
         CGPoint endPoint = CGPointMake(w*(i+1),baseLine);
-        CGPoint controlPoint = CGPointMake(w*(i+1) + arc4random_uniform(w) , h);
+        CGPoint controlPoint = CGPointMake(w*i + arc4random_uniform(w) , h);
         CGPathMoveToPoint(path, NULL, startPoint.x, startPoint.y);
         CGPathAddQuadCurveToPoint(path, NULL, controlPoint.x , controlPoint.y, endPoint.x, endPoint.y);
     }
@@ -293,12 +288,6 @@
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag{
     Bottle *bottle = [anim valueForKey:@"bottle-1"];
     [bottle removeFromSuperview];
-    
-    UIImageView *seagull = [anim valueForKey:@"seagull"];
-    [seagull removeFromSuperview];
-    
-    UIImageView *ballon = [anim valueForKey:@"ballon"];
-    [ballon removeFromSuperview];
 
 }
 

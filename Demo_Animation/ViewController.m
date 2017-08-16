@@ -12,7 +12,9 @@
 #import "MessageBottleView.h"
 
 @interface ViewController ()
-
+{
+    MessageBottleView *view;
+}
 
 @end
 
@@ -21,7 +23,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-
     BottleModel *model = [BottleModel new];
     model.message = @"优惠0.63/升";
     model.messageID = @"12";
@@ -34,13 +35,17 @@
     model2.message = @"96折加油";
     model2.messageID = @"123";
     
-    MessageBottleView *view = [[MessageBottleView alloc]initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
+    view = [[MessageBottleView alloc]initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 200)];
     view.models = @[model,model1,model2];
     [view setActionBottle:^(BottleModel *model){
         NSLog(@"%@",model.message);
     }];
-
+    [view reloadAnimation];
     [self.view addSubview:view];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(runAnimation:) name:UIApplicationWillEnterForegroundNotification object:nil];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -51,6 +56,15 @@
     
 }
 
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [self runAnimation:nil];
+}
+
+- (void)runAnimation:(NSNotification *)notif{
+    [view reloadAnimation];
+
+}
 
 
 @end

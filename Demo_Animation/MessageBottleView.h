@@ -19,7 +19,6 @@ typedef void(^ActionBottle)(BottleModel *model);
 
 
 
-
 @end
 
 
@@ -28,5 +27,7 @@ typedef void(^ActionBottle)(BottleModel *model);
 @property (nonatomic,strong) NSArray *models;
 
 @property (nonatomic,strong) ActionBottle actionBottle;
+
+- (void)reloadAnimation;
 
 @end
