@@ -45,7 +45,6 @@
     [self.view addSubview:view];
     
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(runAnimation:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
 }
 
@@ -59,12 +58,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    [self runAnimation:nil];
-}
-
-- (void)runAnimation:(NSNotification *)notif{
     [view reloadAnimation];
-
 }
 
 

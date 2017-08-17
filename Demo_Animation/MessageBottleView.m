@@ -103,6 +103,7 @@
     int count;
     NSMutableArray *bottles;
     NSTimer *timer ;
+    BOOL isNight;
 }
 @end
 
@@ -116,6 +117,7 @@
         bottles = [NSMutableArray array];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGesture:)];
         [self addGestureRecognizer:tap];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadAnimation) name:UIApplicationWillEnterForegroundNotification object:nil];
         
     }
     return self;
@@ -141,14 +143,37 @@
         [obj removeFromSuperview];
     }];
     UIImageView *bgView = [[UIImageView alloc]initWithFrame:self.bounds];
-    bgView.image = [UIImage imageNamed:@"bg_light"];
     bgView.backgroundColor = [UIColor groupTableViewBackgroundColor];
     [self addSubview:bgView];
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
+    [formatter setDateFormat:@"HH"];
+    NSString *str = [formatter stringFromDate:[NSDate date]];
+    int time = [str intValue];
+    NSString * bg;
+
+    if (time>=18||time<=06) {
+        isNight = YES;
+    }
+    else{
+        isNight = NO;
+    }
+    if (isNight) {
+        bg = @"bg_night";
+    }else{
+        bg = @"bg_light";
+    }
+    bgView.image = [UIImage imageNamed:bg];
+
+    
     [self createWave];
+    if (!isNight) {
+
+        [self createBallon:@"ballon-1" point:CGPointMake(self.frame.size.width / 4, 40)];
+        [self createBallon:@"ballon-2" point:CGPointMake(self.frame.size.width / 4*3, 40)];
+    }
     [self createSeagull:@"seagull-1" point:CGPointMake(self.frame.size.width / 2 - 20, 90)];
     [self createSeagull:@"seagull-2" point:CGPointMake(self.frame.size.width / 2 + 20, 80)];
-    [self createBallon:@"ballon-1" point:CGPointMake(self.frame.size.width / 4, 40)];
-    [self createBallon:@"ballon-2" point:CGPointMake(self.frame.size.width / 4*3, 40)];
     if (!timer) {
         timer =  [NSTimer timerWithTimeInterval:40/3.0 target:self selector:@selector(timerCreate) userInfo:nil repeats:YES];
         [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
@@ -262,7 +287,7 @@
 - (CGPathRef )bottlePath{
     CGMutablePathRef path = CGPathCreateMutable();
     CGFloat w = self.frame.size.width / 10;
-    CGFloat baseLine = 100;
+    CGFloat baseLine = 90;
     CGFloat jump = 30;
     
     for (int i =0; i< 15; i++) {

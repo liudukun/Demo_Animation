@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+///自定义model
+
 @interface BottleModel : NSObject
 
 @property (nonatomic,strong) NSString *message;
