@@ -65,6 +65,9 @@
     bottleImageView = [[UIImageView alloc]initWithFrame:CGRectMake((selfWidth - bottleWidth)/2, 70 - 5,  bottleWidth, bottleHeight)];
     bottleImageView.image = bottleImage;
     [self addSubview:bottleImageView];
+    CGRect rect = self.frame;
+    rect.size.height = CGRectGetMaxY(bottleImageView.frame) - bottleHeight/2.5;
+    self.frame = rect;
     
     [self runAnimation];
 }

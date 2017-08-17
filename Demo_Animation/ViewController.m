@@ -39,6 +39,7 @@
     view.models = @[model,model1,model2];
     [view setActionBottle:^(BottleModel *model){
         NSLog(@"%@",model.message);
+        [[[UIAlertView alloc]initWithTitle:@"notice" message:model.message delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil] show];
     }];
     [view reloadAnimation];
     [self.view addSubview:view];
